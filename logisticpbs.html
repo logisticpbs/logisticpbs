@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanda Terima Material - PT Panca Baswara Sakti</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-3 md:p-8">
+  <div class="max-w-5xl mx-auto bg-white p-5 md:p-8 rounded-xl shadow-md">
+    
+    <!-- Header dengan Logo di Pojok Kanan & Ukuran Lebih Besar -->
+    <div class="border-b pb-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-center md:text-left">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">TANDA TERIMA MATERIAL</h1>
+        <p class="text-xs md:text-sm text-gray-500 font-semibold">PT PANCA BASWARA SAKTI</p>
+      </div>
+      <div>
+        <img src="https://i.ibb.co.com/bg64gLBQ/Whats-App-Image-2026-09-30-at-15-57-23.jpg" alt="Logo PT PBS" class="h-24 md:h-28 object-contain rounded-md shadow-sm">
+      </div>
+    </div>
+
+    <form id="materialForm">
+      
+      <!-- Pilihan Lokasi Gudang & Jenis Laporan -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+          <label class="block text-sm font-bold text-gray-800 mb-2">Pilih Gudang / Lokasi <span class="text-red-500">*</span></label>
+          <select id="gudang" required class="w-full p-2 border border-gray-300 rounded-md font-bold text-gray-800 bg-white" onchange="updateStasiunOptions()">
+            <option value="" disabled selected>-- Pilih Gudang --</option>
+            <option value="GUDANG JOMBANG">GUDANG JOMBANG</option>
+            <option value="GUDANG SURABAYA">GUDANG SURABAYA</option>
+            <option value="GUDANG MADIUN">GUDANG MADIUN</option>
+          </select>
+        </div>
+
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <label class="block text-sm font-bold text-gray-800 mb-2">Pilih Jenis Laporan <span class="text-red-500">*</span></label>
+          <div class="flex flex-col sm:flex-row gap-4 mt-2">
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="radio" name="tipeLaporan" value="Keluar" checked class="w-4 h-4 text-blue-600" onchange="toggleTipeLaporan()">
+              <span class="ml-2 font-medium text-gray-700">📤 Material Keluar</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="radio" name="tipeLaporan" value="Masuk" class="w-4 h-4 text-blue-600" onchange="toggleTipeLaporan()">
+              <span class="ml-2 font-medium text-gray-700">📥 Material Masuk</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informasi Header (Wajib Diisi Semua) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Tanggal <span class="text-red-500">*</span></label>
+          <input type="date" id="tanggal" required class="mt-1 w-full p-2 border rounded-md">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">PIC / Mandor <span class="text-red-500">*</span></label>
+          <input type="text" id="pic" placeholder="Nama Mandor / PIC" required class="mt-1 w-full p-2 border rounded-md">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">No Telpon <span class="text-red-500">*</span></label>
+          <input type="tel" id="noTelpon" placeholder="08xxxxxxxxxx" required class="mt-1 w-full p-2 border rounded-md">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Stasiun <span class="text-red-500">*</span></label>
+          <select id="stasiun" required class="mt-1 w-full p-2 border rounded-md bg-white" onchange="updateDesaOptions()">
+            <option value="" disabled selected>-- Pilih Gudang Terlebih Dahulu --</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Desa <span class="text-red-500">*</span></label>
+          <select id="desa" required class="mt-1 w-full p-2 border rounded-md bg-white">
+            <option value="" disabled selected>-- Pilih Stasiun Terlebih Dahulu --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabel Input Material -->
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-sm text-left border-collapse border border-gray-300">
+          <thead class="bg-gray-200 text-xs text-gray-800 uppercase">
+            <tr>
+              <th class="border border-gray-300 px-2 py-2 text-center w-10">No</th>
+              <th class="border border-gray-300 px-3 py-2">Material <span class="text-red-500">*</span></th>
+              <th class="border border-gray-300 px-2 py-2 text-center w-24">UoM</th>
+              <th class="col-keluar border border-gray-300 px-2 py-2 text-center bg-green-100">Qty Keluar</th>
+              <th class="col-masuk border border-gray-300 px-2 py-2 text-center bg-yellow-100 hidden">Qty Terpakai</th>
+              <th class="col-masuk border border-gray-300 px-2 py-2 text-center bg-red-100 hidden">Qty Pengembalian</th>
+              <th class="border border-gray-300 px-3 py-2">Keterangan</th>
+              <th class="border border-gray-300 px-2 py-2 text-center w-10">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="materialTableBody">
+            <tr class="material-row">
+              <td class="border border-gray-300 text-center row-number">1</td>
+              <td class="border border-gray-300 p-1">
+                <select class="material w-full p-1 border rounded bg-white text-xs md:text-sm mb-1" required onchange="handleMaterialChange(this)">
+                  <option value="" disabled selected>-- Pilih Material --</option>
+                  <option value="ADSS FO Cable - 24C">ADSS FO Cable - 24C</option>
+                  <option value="ADSS FO Cable - 48C">ADSS FO Cable - 48C</option>
+                  <option value="ADSS FO Cable - 96C">ADSS FO Cable - 96C</option>
+                  <option value="ADSS FO Cable - 144C">ADSS FO Cable - 144C</option>
+                  <option value="ADSS FO Cable - 288C">ADSS FO Cable - 288C</option>
+                  <option value="Pole 6m (2,5&quot;/2,5mm)">Pole 6m (2,5"/2,5mm)</option>
+                  <option value="Pole 6m (4&quot;/3mm)">Pole 6m (4"/3mm)</option>
+                  <option value="Pole 7m (3&quot;/2,5&quot;/2,5mm)">Pole 7m (3"/2,5"/2,5mm)</option>
+                  <option value="Pole 7m (4&quot;/3”/3mm)">Pole 7m (4"/3”/3mm)</option>
+                  <option value="Pole 9m (4&quot;/3&quot;/2,5mm)">Pole 9m (4"/3"/2,5mm)</option>
+                  <option value="Pole 9m (4&quot;/3”/3mm)">Pole 9m (4"/3”/3mm)</option>
+                  <option value="Strength Clamp 25/50 (Include Clamp A)">Strength Clamp 25/50 (Include Clamp A)</option>
+                  <option value="Strength Clamp 50/70 (Include Clamp A)">Strength Clamp 50/70 (Include Clamp A)</option>
+                  <option value="Strength Clamp 70/90 (Include Clamp A)">Strength Clamp 70/90 (Include Clamp A)</option>
+                  <option value="X Frame 80 x 80">X Frame 80 x 80</option>
+                  <option value="X Frame 40 x 40">X Frame 40 x 40</option>
+                  <option value="Stainless Belt 50m">Stainless Belt 50m</option>
+                  <option value="Stopping Buckler">Stopping Buckler</option>
+                  <option value="Clamp Hook">Clamp Hook</option>
+                  <option value="Clamp S">Clamp S</option>
+                  <option value="Clamp Ring">Clamp Ring</option>
+                  <option value="Mini Closure 24C">Mini Closure 24C</option>
+                  <option value="Closure - 24C">Closure - 24C</option>
+                  <option value="Closure - 48C">Closure - 48C</option>
+                  <option value="Closure - 96C">Closure - 96C</option>
+                  <option value="Closure - 144C">Closure - 144C</option>
+                  <option value="Closure - 288C">Closure - 288C</option>
+                  <option value="OTB (Optical Termination Box) - 48C LC/UPC">OTB (Optical Termination Box) - 48C LC/UPC</option>
+                  <option value="OTB (Optical Termination Box) - 96C LC/UPC">OTB (Optical Termination Box) - 96C LC/UPC</option>
+                  <option value="OTB (Optical Termination Box) - 144C LC/UPC">OTB (Optical Termination Box) - 144C LC/UPC</option>
+                  <option value="OTB (Optical Termination Box) - 288C LC/UPC">OTB (Optical Termination Box) - 288C LC/UPC</option>
+                  <option value="Patchcord 3m SC-LC/UPC Duplex">Patchcord 3m SC-LC/UPC Duplex</option>
+                  <option value="Patchcord 5m SC-LC/UPC Duplex">Patchcord 5m SC-LC/UPC Duplex</option>
+                  <option value="Patchcord 10m SC-LC/UPC Duplex">Patchcord 10m SC-LC/UPC Duplex</option>
+                  <option value="Patchcord 3m SC-SC/UPC Simplex">Patchcord 3m SC-SC/UPC Simplex</option>
+                  <option value="Patchcord 3m SC-SC/UPC Simplex Outdoor">Patchcord 3m SC-SC/UPC Simplex Outdoor</option>
+                  <option value="HDPE Pipe 40/34">HDPE Pipe 40/34</option>
+                  <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 50m">Pre-Connectorized (PreCon) Cable Blue UPC - 50m</option>
+                  <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 100m">Pre-Connectorized (PreCon) Cable Blue UPC - 100m</option>
+                  <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 150m">Pre-Connectorized (PreCon) Cable Blue UPC - 150m</option>
+                  <option value="ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter">ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter</option>
+                  <option value="ODP (Optical Distribution Point) - 8P With Modular Splitter">ODP (Optical Distribution Point) - 8P With Modular Splitter</option>
+                  <option value="OTHER">✨ Lainnya (Ketik Manual)</option>
+                </select>
+                <input type="text" class="custom-material w-full p-1 border rounded bg-yellow-50 text-xs md:text-sm hidden mt-1" placeholder="Ketik nama material manual...">
+              </td>
+              <td class="border border-gray-300 p-1 text-center align-top">
+                <input type="text" class="uom w-full p-1 border rounded bg-gray-50 text-center text-xs font-semibold" placeholder="UoM" required>
+              </td>
+              <td class="col-keluar border border-gray-300 p-1 align-top"><input type="number" min="0" class="qtyKeluar w-full p-1 border rounded text-center" value="0"></td>
+              <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyTerpakai w-full p-1 border rounded text-center" value="0"></td>
+              <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyPengembalian w-full p-1 border rounded text-center" value="0"></td>
+              <td class="border border-gray-300 p-1 align-top"><input type="text" class="keterangan w-full p-1 border rounded" placeholder="Catatan"></td>
+              <td class="border border-gray-300 text-center p-1 align-top">
+                <button type="button" onclick="removeRow(this)" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-start mb-8">
+        <button type="button" onclick="addRow()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-semibold">
+          + Tambah Baris
+        </button>
+      </div>
+
+      <!-- Section Tanda Tangan Digital -->
+      <div class="border-t pt-6 mb-6">
+        <h3 class="text-md font-bold text-gray-800 mb-4 text-center">TANDA TANGAN PENGESAHAN <span class="text-red-500">*</span></h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- TTD Admin Gudang -->
+          <div class="flex flex-col items-center">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Admin Gudang</label>
+            <div class="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 w-full max-w-xs">
+              <canvas id="canvasAdmin" class="w-full h-36 touch-none"></canvas>
+            </div>
+            <button type="button" onclick="padAdmin.clear()" class="mt-2 text-xs text-red-600 font-semibold hover:underline">Clear / Hapus TTD</button>
+          </div>
+
+          <!-- TTD PIC / Mandor -->
+          <div class="flex flex-col items-center">
+            <label class="block text-sm font-bold text-gray-700 mb-2">PIC / Mandor Lapangan</label>
+            <div class="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 w-full max-w-xs">
+              <canvas id="canvasPic" class="w-full h-36 touch-none"></canvas>
+            </div>
+            <button type="button" onclick="padPic.clear()" class="mt-2 text-xs text-red-600 font-semibold hover:underline">Clear / Hapus TTD</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tombol Kirim -->
+      <div class="flex justify-end border-t pt-4">
+        <button type="submit" id="submitBtn" class="w-full md:w-auto bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 font-bold text-lg">
+          Kirim Laporan
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyayEZpxi4h6D9SuijzHbPirRADlefnTxzSEAegr9ouw1PJuWA_4GiY0pA4TDCxqJR9tw/exec";
+
+    document.getElementById('tanggal').valueAsDate = new Date();
+
+    const canvasAdmin = document.getElementById('canvasAdmin');
+    const canvasPic = document.getElementById('canvasPic');
+    const padAdmin = new SignaturePad(canvasAdmin);
+    const padPic = new SignaturePad(canvasPic);
+
+    // Data relokasi Stasiun dan Desa berdasarkan Gudang
+    const dataWilayah = {
+      "GUDANG JOMBANG": {
+        "SEMBUNG": ["Desa Perak", "Desa Brodot", "Desa Gading mangu", "Desa Tinggar"],
+        "PAGERWOJO": ["Desa Pagerwojo", "Desa Banjarbendo"],
+        "BUDURAN": ["Desa Sidokerto", "Desa Sidokepung"],
+        "GEDANGAN": ["Desa Keboansikep"],
+        "MARGOREJO": ["Desa Margorejo"]
+      },
+      "GUDANG SURABAYA": {
+        "STASIUN SURABAYA KOTA": ["Desa Peneleh", "Desa Bongkaran"],
+        "STASIUN GUBENG": ["Desa Gubeng", "Desa Airlangga"]
+      },
+      "GUDANG MADIUN": {
+        "STASIUN MADIUN": ["Desa Madiun Lor", "Desa Oro-oro Ombo"]
+      }
+    };
+
+    function updateStasiunOptions() {
+      const gudangSelect = document.getElementById('gudang').value;
+      const stasiunSelect = document.getElementById('stasiun');
+      const desaSelect = document.getElementById('desa');
+
+      stasiunSelect.innerHTML = '<option value="" disabled selected>-- Pilih Stasiun --</option>';
+      desaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Stasiun Terlebih Dahulu --</option>';
+
+      if (dataWilayah[gudangSelect]) {
+        const stasiunList = Object.keys(dataWilayah[gudangSelect]);
+        stasiunList.forEach(stasiun => {
+          const opt = document.createElement('option');
+          opt.value = stasiun;
+          opt.textContent = stasiun;
+          stasiunSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function updateDesaOptions() {
+      const gudangSelect = document.getElementById('gudang').value;
+      const stasiunSelect = document.getElementById('stasiun').value;
+      const desaSelect = document.getElementById('desa');
+
+      desaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Desa --</option>';
+
+      if (dataWilayah[gudangSelect] && dataWilayah[gudangSelect][stasiunSelect]) {
+        const desaList = dataWilayah[gudangSelect][stasiunSelect];
+        desaList.forEach(desa => {
+          const opt = document.createElement('option');
+          opt.value = desa;
+          opt.textContent = desa;
+          desaSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function resizeCanvas() {
+      [canvasAdmin, canvasPic].forEach(canvas => {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+      });
+      padAdmin.clear();
+      padPic.clear();
+    }
+    window.addEventListener("resize", resizeCanvas);
+    setTimeout(resizeCanvas, 300);
+
+    function handleMaterialChange(selectElement) {
+      const row = selectElement.closest('tr');
+      const val = selectElement.value;
+      const uomInput = row.querySelector('.uom');
+      const customInput = row.querySelector('.custom-material');
+
+      if (val === 'OTHER') {
+        customInput.classList.remove('hidden');
+        customInput.required = true;
+        customInput.focus();
+        uomInput.value = '';
+        uomInput.readOnly = false;
+        uomInput.placeholder = 'Ketik UoM';
+      } else {
+        customInput.classList.add('hidden');
+        customInput.required = false;
+        customInput.value = '';
+        uomInput.readOnly = true;
+
+        const lowerVal = val.toLowerCase();
+        if (lowerVal.includes('cable') || lowerVal.includes('pipe') || lowerVal.includes('belt')) {
+          uomInput.value = 'm';
+        } else if (lowerVal.includes('roll')) {
+          uomInput.value = 'Roll';
+        } else if (lowerVal.includes('set')) {
+          uomInput.value = 'set';
+        } else {
+          uomInput.value = 'pcs';
+        }
+      }
+    }
+
+    function toggleTipeLaporan() {
+      const tipe = document.querySelector('input[name="tipeLaporan"]:checked').value;
+      const colKeluar = document.querySelectorAll('.col-keluar');
+      const colMasuk = document.querySelectorAll('.col-masuk');
+
+      if (tipe === 'Keluar') {
+        colKeluar.forEach(el => el.classList.remove('hidden'));
+        colMasuk.forEach(el => el.classList.add('hidden'));
+      } else {
+        colKeluar.forEach(el => el.classList.add('hidden'));
+        colMasuk.forEach(el => el.classList.remove('hidden'));
+      }
+    }
+
+    function updateRowNumbers() {
+      document.querySelectorAll('.material-row').forEach((row, index) => {
+        row.querySelector('.row-number').textContent = index + 1;
+      });
+    }
+
+    function addRow() {
+      const tbody = document.getElementById('materialTableBody');
+      const newRow = document.createElement('tr');
+      newRow.className = 'material-row';
+      newRow.innerHTML = `
+        <td class="border border-gray-300 text-center row-number"></td>
+        <td class="border border-gray-300 p-1">
+          <select class="material w-full p-1 border rounded bg-white text-xs md:text-sm mb-1" required onchange="handleMaterialChange(this)">
+            <option value="" disabled selected>-- Pilih Material --</option>
+            <option value="ADSS FO Cable - 24C">ADSS FO Cable - 24C</option>
+            <option value="ADSS FO Cable - 48C">ADSS FO Cable - 48C</option>
+            <option value="ADSS FO Cable - 96C">ADSS FO Cable - 96C</option>
+            <option value="ADSS FO Cable - 144C">ADSS FO Cable - 144C</option>
+            <option value="ADSS FO Cable - 288C">ADSS FO Cable - 288C</option>
+            <option value="Pole 6m (2,5&quot;/2,5mm)">Pole 6m (2,5"/2,5mm)</option>
+            <option value="Pole 6m (4&quot;/3mm)">Pole 6m (4"/3mm)</option>
+            <option value="Pole 7m (3&quot;/2,5&quot;/2,5mm)">Pole 7m (3"/2,5"/2,5mm)</option>
+            <option value="Pole 7m (4&quot;/3”/3mm)">Pole 7m (4"/3”/3mm)</option>
+            <option value="Pole 9m (4&quot;/3&quot;/2,5mm)">Pole 9m (4"/3"/2,5mm)</option>
+            <option value="Pole 9m (4&quot;/3”/3mm)">Pole 9m (4"/3”/3mm)</option>
+            <option value="Strength Clamp 25/50 (Include Clamp A)">Strength Clamp 25/50 (Include Clamp A)</option>
+            <option value="Strength Clamp 50/70 (Include Clamp A)">Strength Clamp 50/70 (Include Clamp A)</option>
+            <option value="Strength Clamp 70/90 (Include Clamp A)">Strength Clamp 70/90 (Include Clamp A)</option>
+            <option value="X Frame 80 x 80">X Frame 80 x 80</option>
+            <option value="X Frame 40 x 40">X Frame 40 x 40</option>
+            <option value="Stainless Belt 50m">Stainless Belt 50m</option>
+            <option value="Stopping Buckler">Stopping Buckler</option>
+            <option value="Clamp Hook">Clamp Hook</option>
+            <option value="Clamp S">Clamp S</option>
+            <option value="Clamp Ring">Clamp Ring</option>
+            <option value="Mini Closure 24C">Mini Closure 24C</option>
+            <option value="Closure - 24C">Closure - 24C</option>
+            <option value="Closure - 48C">Closure - 48C</option>
+            <option value="Closure - 96C">Closure - 96C</option>
+            <option value="Closure - 144C">Closure - 144C</option>
+            <option value="Closure - 288C">Closure - 288C</option>
+            <option value="OTB (Optical Termination Box) - 48C LC/UPC">OTB (Optical Termination Box) - 48C LC/UPC</option>
+            <option value="OTB (Optical Termination Box) - 96C LC/UPC">OTB (Optical Termination Box) - 96C LC/UPC</option>
+            <option value="OTB (Optical Termination Box) - 144C LC/UPC">OTB (Optical Termination Box) - 144C LC/UPC</option>
+            <option value="OTB (Optical Termination Box) - 288C LC/UPC">OTB (Optical Termination Box) - 288C LC/UPC</option>
+            <option value="Patchcord 3m SC-LC/UPC Duplex">Patchcord 3m SC-LC/UPC Duplex</option>
+            <option value="Patchcord 5m SC-LC/UPC Duplex">Patchcord 5m SC-LC/UPC Duplex</option>
+            <option value="Patchcord 10m SC-LC/UPC Duplex">Patchcord 10m SC-LC/UPC Duplex</option>
+            <option value="Patchcord 3m SC-SC/UPC Simplex">Patchcord 3m SC-SC/UPC Simplex</option>
+            <option value="Patchcord 3m SC-SC/UPC Simplex Outdoor">Patchcord 3m SC-SC/UPC Simplex Outdoor</option>
+            <option value="HDPE Pipe 40/34">HDPE Pipe 40/34</option>
+            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 50m">Pre-Connectorized (PreCon) Cable Blue UPC - 50m</option>
+            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 100m">Pre-Connectorized (PreCon) Cable Blue UPC - 100m</option>
+            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 150m">Pre-Connectorized (PreCon) Cable Blue UPC - 150m</option>
+            <option value="ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter">ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter</option>
+            <option value="ODP (Optical Distribution Point) - 8P With Modular Splitter">ODP (Optical Distribution Point) - 8P With Modular Splitter</option>
+            <option value="OTHER">✨ Lainnya (Ketik Manual)</option>
+          </select>
+          <input type="text" class="custom-material w-full p-1 border rounded bg-yellow-50 text-xs md:text-sm hidden mt-1" placeholder="Ketik nama material manual...">
+        </td>
+        <td class="border border-gray-300 p-1 text-center align-top">
+          <input type="text" class="uom w-full p-1 border rounded bg-gray-50 text-center text-xs font-semibold" placeholder="UoM" required>
+        </td>
+        <td class="col-keluar border border-gray-300 p-1 align-top"><input type="number" min="0" class="qtyKeluar w-full p-1 border rounded text-center" value="0"></td>
+        <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyTerpakai w-full p-1 border rounded text-center" value="0"></td>
+        <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyPengembalian w-full p-1 border rounded text-center" value="0"></td>
+        <td class="border border-gray-300 p-1 align-top"><input type="text" class="keterangan w-full p-1 border rounded" placeholder="Catatan"></td>
+        <td class="border border-gray-300 text-center p-1 align-top">
+          <button type="button" onclick="removeRow(this)" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">X</button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+      updateRowNumbers();
+      toggleTipeLaporan();
+    }
+
+    function removeRow(button) {
+      if (document.querySelectorAll('.material-row').length > 1) {
+        button.closest('tr').remove();
+        updateRowNumbers();
+      } else {
+        alert("Minimal harus ada 1 baris material.");
+      }
+    }
+
+    document.getElementById('materialForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (padAdmin.isEmpty() || padPic.isEmpty()) {
+        alert("Harap lengkapi kedua tanda tangan (Admin Gudang & PIC / Mandor) sebelum mengirim!");
+        return;
+      }
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Mengirim...";
+
+      const gudang = document.getElementById('gudang').value;
+      const tipeLaporan = document.querySelector('input[name="tipeLaporan"]:checked').value;
+      const items = [];
+
+      let isValid = true;
+      document.querySelectorAll('.material-row').forEach(row => {
+        const selectEl = row.querySelector('.material');
+        const customEl = row.querySelector('.custom-material');
+        let materialName = selectEl.value;
+
+        if (materialName === 'OTHER') {
+          materialName = customEl.value.trim();
+          if (!materialName) isValid = false;
+        }
+
+        items.push({
+          material: materialName,
+          uom: row.querySelector('.uom').value || '-',
+          qtyKeluar: row.querySelector('.qtyKeluar').value || 0,
+          qtyTerpakai: row.querySelector('.qtyTerpakai').value || 0,
+          qtyPengembalian: row.querySelector('.qtyPengembalian').value || 0,
+          keterangan: row.querySelector('.keterangan').value || ''
+        });
+      });
+
+      if (!isValid) {
+        alert("Harap isi nama material manual pada opsi 'Lainnya'.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Kirim Laporan";
+        return;
+      }
+
+      const payload = {
+        gudang: gudang,
+        tipeLaporan: tipeLaporan,
+        tanggal: document.getElementById('tanggal').value,
+        pic: document.getElementById('pic').value,
+        noTelpon: document.getElementById('noTelpon').value,
+        stasiun: document.getElementById('stasiun').value,
+        desa: document.getElementById('desa').value,
+        ttdAdmin: padAdmin.toDataURL(),
+        ttdPic: padPic.toDataURL(),
+        items: items
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("Laporan berhasil dikirim beserta Tanda Tangan!");
+        document.getElementById('materialForm').reset();
+        padAdmin.clear();
+        padPic.clear();
+        document.getElementById('tanggal').valueAsDate = new Date();
+        document.getElementById('stasiun').innerHTML = '<option value="" disabled selected>-- Pilih Gudang Terlebih Dahulu --</option>';
+        document.getElementById('desa').innerHTML = '<option value="" disabled selected>-- Pilih Stasiun Terlebih Dahulu --</option>';
+        toggleTipeLaporan();
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Kirim Laporan";
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert("Gagal mengirim data.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Kirim Laporan";
+      });
+    });
+  </script>
+</body>
+</html>
