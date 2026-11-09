@@ -10,7 +10,7 @@
 <body class="bg-gray-100 p-3 md:p-8">
   <div class="max-w-5xl mx-auto bg-white p-5 md:p-8 rounded-xl shadow-md">
     
-    <!-- Header dengan Logo di Pojok Kanan & Ukuran Lebih Besar -->
+    <!-- Header dengan Logo di Pojok Kanan -->
     <div class="border-b pb-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="text-center md:text-left">
         <h1 class="text-xl md:text-2xl font-bold text-gray-800">TANDA TERIMA MATERIAL</h1>
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <!-- Informasi Header (Wajib Diisi Semua) -->
+      <!-- Informasi Header -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-gray-700">Tanggal <span class="text-red-500">*</span></label>
@@ -62,7 +62,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">No Telpon <span class="text-red-500">*</span></label>
-          <input type="tel" id="noTelpon" placeholder="08xxxxxxxxxx" required class="mt-1 w-full p-2 border rounded-md">
+          <input type="tel" id="noTelpon" pattern="[0-9+ ]+" placeholder="08xxxxxxxxxx" required class="mt-1 w-full p-2 border rounded-md">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Stasiun <span class="text-red-500">*</span></label>
@@ -146,7 +146,7 @@
                 <input type="text" class="custom-material w-full p-1 border rounded bg-yellow-50 text-xs md:text-sm hidden mt-1" placeholder="Ketik nama material manual...">
               </td>
               <td class="border border-gray-300 p-1 text-center align-top">
-                <input type="text" class="uom w-full p-1 border rounded bg-gray-50 text-center text-xs font-semibold" placeholder="UoM" required>
+                <input type="text" class="uom w-full p-1 border rounded bg-gray-50 text-center text-xs font-semibold" placeholder="UoM" required readonly>
               </td>
               <td class="col-keluar border border-gray-300 p-1 align-top"><input type="number" min="0" class="qtyKeluar w-full p-1 border rounded text-center" value="0"></td>
               <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyTerpakai w-full p-1 border rounded text-center" value="0"></td>
@@ -214,11 +214,8 @@
     // Data relokasi Stasiun dan Desa berdasarkan Gudang
     const dataWilayah = {
       "GUDANG JOMBANG": {
-        "SEMBUNG": ["Desa Perak", "Desa Brodot", "Desa Gading mangu", "Desa Tinggar"],
-        "PAGERWOJO": ["Desa Pagerwojo", "Desa Banjarbendo"],
-        "BUDURAN": ["Desa Sidokerto", "Desa Sidokepung"],
-        "GEDANGAN": ["Desa Keboansikep"],
-        "MARGOREJO": ["Desa Margorejo"]
+        "Stasiun Jombang": ["Desa Bandarjowo"],
+        "Stasiun Peterongan": ["Desa Tanjunggunung", "Desa Sambirejo", "Desa Sukosari"]
       },
       "GUDANG SURABAYA": {
         "STASIUN SURABAYA KOTA": ["Desa Peneleh", "Desa Bongkaran"],
@@ -267,14 +264,14 @@
     }
 
     function resizeCanvas() {
-      [canvasAdmin, canvasPic].forEach(canvas => {
+      [ { canvas: canvasAdmin, pad: padAdmin }, { canvas: canvasPic, pad: padPic } ].forEach(item => {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
+        const data = item.pad.toData();
+        item.canvas.width = item.canvas.offsetWidth * ratio;
+        item.canvas.height = item.canvas.offsetHeight * ratio;
+        item.canvas.getContext("2d").scale(ratio, ratio);
+        item.pad.fromData(data);
       });
-      padAdmin.clear();
-      padPic.clear();
     }
     window.addEventListener("resize", resizeCanvas);
     setTimeout(resizeCanvas, 300);
@@ -333,70 +330,22 @@
 
     function addRow() {
       const tbody = document.getElementById('materialTableBody');
-      const newRow = document.createElement('tr');
-      newRow.className = 'material-row';
-      newRow.innerHTML = `
-        <td class="border border-gray-300 text-center row-number"></td>
-        <td class="border border-gray-300 p-1">
-          <select class="material w-full p-1 border rounded bg-white text-xs md:text-sm mb-1" required onchange="handleMaterialChange(this)">
-            <option value="" disabled selected>-- Pilih Material --</option>
-            <option value="ADSS FO Cable - 24C">ADSS FO Cable - 24C</option>
-            <option value="ADSS FO Cable - 48C">ADSS FO Cable - 48C</option>
-            <option value="ADSS FO Cable - 96C">ADSS FO Cable - 96C</option>
-            <option value="ADSS FO Cable - 144C">ADSS FO Cable - 144C</option>
-            <option value="ADSS FO Cable - 288C">ADSS FO Cable - 288C</option>
-            <option value="Pole 6m (2,5&quot;/2,5mm)">Pole 6m (2,5"/2,5mm)</option>
-            <option value="Pole 6m (4&quot;/3mm)">Pole 6m (4"/3mm)</option>
-            <option value="Pole 7m (3&quot;/2,5&quot;/2,5mm)">Pole 7m (3"/2,5"/2,5mm)</option>
-            <option value="Pole 7m (4&quot;/3”/3mm)">Pole 7m (4"/3”/3mm)</option>
-            <option value="Pole 9m (4&quot;/3&quot;/2,5mm)">Pole 9m (4"/3"/2,5mm)</option>
-            <option value="Pole 9m (4&quot;/3”/3mm)">Pole 9m (4"/3”/3mm)</option>
-            <option value="Strength Clamp 25/50 (Include Clamp A)">Strength Clamp 25/50 (Include Clamp A)</option>
-            <option value="Strength Clamp 50/70 (Include Clamp A)">Strength Clamp 50/70 (Include Clamp A)</option>
-            <option value="Strength Clamp 70/90 (Include Clamp A)">Strength Clamp 70/90 (Include Clamp A)</option>
-            <option value="X Frame 80 x 80">X Frame 80 x 80</option>
-            <option value="X Frame 40 x 40">X Frame 40 x 40</option>
-            <option value="Stainless Belt 50m">Stainless Belt 50m</option>
-            <option value="Stopping Buckler">Stopping Buckler</option>
-            <option value="Clamp Hook">Clamp Hook</option>
-            <option value="Clamp S">Clamp S</option>
-            <option value="Clamp Ring">Clamp Ring</option>
-            <option value="Mini Closure 24C">Mini Closure 24C</option>
-            <option value="Closure - 24C">Closure - 24C</option>
-            <option value="Closure - 48C">Closure - 48C</option>
-            <option value="Closure - 96C">Closure - 96C</option>
-            <option value="Closure - 144C">Closure - 144C</option>
-            <option value="Closure - 288C">Closure - 288C</option>
-            <option value="OTB (Optical Termination Box) - 48C LC/UPC">OTB (Optical Termination Box) - 48C LC/UPC</option>
-            <option value="OTB (Optical Termination Box) - 96C LC/UPC">OTB (Optical Termination Box) - 96C LC/UPC</option>
-            <option value="OTB (Optical Termination Box) - 144C LC/UPC">OTB (Optical Termination Box) - 144C LC/UPC</option>
-            <option value="OTB (Optical Termination Box) - 288C LC/UPC">OTB (Optical Termination Box) - 288C LC/UPC</option>
-            <option value="Patchcord 3m SC-LC/UPC Duplex">Patchcord 3m SC-LC/UPC Duplex</option>
-            <option value="Patchcord 5m SC-LC/UPC Duplex">Patchcord 5m SC-LC/UPC Duplex</option>
-            <option value="Patchcord 10m SC-LC/UPC Duplex">Patchcord 10m SC-LC/UPC Duplex</option>
-            <option value="Patchcord 3m SC-SC/UPC Simplex">Patchcord 3m SC-SC/UPC Simplex</option>
-            <option value="Patchcord 3m SC-SC/UPC Simplex Outdoor">Patchcord 3m SC-SC/UPC Simplex Outdoor</option>
-            <option value="HDPE Pipe 40/34">HDPE Pipe 40/34</option>
-            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 50m">Pre-Connectorized (PreCon) Cable Blue UPC - 50m</option>
-            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 100m">Pre-Connectorized (PreCon) Cable Blue UPC - 100m</option>
-            <option value="Pre-Connectorized (PreCon) Cable Blue UPC - 150m">Pre-Connectorized (PreCon) Cable Blue UPC - 150m</option>
-            <option value="ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter">ODC (Optical Distribution Cabinet) - 4P With Casette Spiltter</option>
-            <option value="ODP (Optical Distribution Point) - 8P With Modular Splitter">ODP (Optical Distribution Point) - 8P With Modular Splitter</option>
-            <option value="OTHER">✨ Lainnya (Ketik Manual)</option>
-          </select>
-          <input type="text" class="custom-material w-full p-1 border rounded bg-yellow-50 text-xs md:text-sm hidden mt-1" placeholder="Ketik nama material manual...">
-        </td>
-        <td class="border border-gray-300 p-1 text-center align-top">
-          <input type="text" class="uom w-full p-1 border rounded bg-gray-50 text-center text-xs font-semibold" placeholder="UoM" required>
-        </td>
-        <td class="col-keluar border border-gray-300 p-1 align-top"><input type="number" min="0" class="qtyKeluar w-full p-1 border rounded text-center" value="0"></td>
-        <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyTerpakai w-full p-1 border rounded text-center" value="0"></td>
-        <td class="col-masuk border border-gray-300 p-1 hidden align-top"><input type="number" min="0" class="qtyPengembalian w-full p-1 border rounded text-center" value="0"></td>
-        <td class="border border-gray-300 p-1 align-top"><input type="text" class="keterangan w-full p-1 border rounded" placeholder="Catatan"></td>
-        <td class="border border-gray-300 text-center p-1 align-top">
-          <button type="button" onclick="removeRow(this)" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">X</button>
-        </td>
-      `;
+      const firstRow = tbody.querySelector('.material-row');
+      const newRow = firstRow.cloneNode(true);
+      
+      // Reset values
+      newRow.querySelector('.material').selectedIndex = 0;
+      newRow.querySelector('.custom-material').value = '';
+      newRow.querySelector('.custom-material').classList.add('hidden');
+      newRow.querySelector('.custom-material').required = false;
+      newRow.querySelector('.uom').value = '';
+      newRow.querySelector('.uom').readOnly = true;
+      newRow.querySelector('.uom').placeholder = 'UoM';
+      newRow.querySelector('.qtyKeluar').value = '0';
+      newRow.querySelector('.qtyTerpakai').value = '0';
+      newRow.querySelector('.qtyPengembalian').value = '0';
+      newRow.querySelector('.keterangan').value = '';
+
       tbody.appendChild(newRow);
       updateRowNumbers();
       toggleTipeLaporan();
