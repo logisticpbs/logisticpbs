@@ -30,8 +30,10 @@
           <select id="gudang" required class="w-full p-2 border border-gray-300 rounded-md font-bold text-gray-800 bg-white" onchange="updateStasiunOptions()">
             <option value="" disabled selected>-- Pilih Gudang --</option>
             <option value="GUDANG JOMBANG">GUDANG JOMBANG</option>
-            <option value="GUDANG SURABAYA">GUDANG SURABAYA</option>
+            <option value="GUDANG NGANJUK">GUDANG NGANJUK</option>
             <option value="GUDANG MADIUN">GUDANG MADIUN</option>
+            <option value="GUDANG SIDOARJO">GUDANG SIDOARJO</option>
+            <option value="GUDANG SURABAYA">GUDANG SURABAYA</option>
           </select>
         </div>
 
@@ -211,23 +213,28 @@
     const padAdmin = new SignaturePad(canvasAdmin);
     const padPic = new SignaturePad(canvasPic);
 
-    // Data relokasi Stasiun dan Desa (Gudang Jombang lengkap dengan JOMBANG & PETERONGAN kapital)
+    // Data relokasi Stasiun dan Desa
     const dataWilayah = {
       "GUDANG JOMBANG": {
         "SEMBUNG": ["Desa Perak", "Desa Brodot", "Desa Gading mangu", "Desa Tinggar"],
-        "PAGERWOJO": ["Desa Pagerwojo", "Desa Banjarbendo"],
-        "BUDURAN": ["Desa Sidokerto", "Desa Sidokepung"],
-        "GEDANGAN": ["Desa Keboansikep"],
-        "MARGOREJO": ["Desa Margorejo"],
         "JOMBANG": ["Desa Bandarjowo"],
         "PETERONGAN": ["Desa Tanjunggunung", "Desa Sambirejo", "Desa Sukosari"]
       },
-      "GUDANG SURABAYA": {
-        "STASIUN SURABAYA KOTA": ["Desa Peneleh", "Desa Bongkaran"],
-        "STASIUN GUBENG": ["Desa Gubeng", "Desa Airlangga"]
+      "GUDANG NGANJUK": {
+        "BAGOR": ["Desa Ngudikan", "Desa Bandungan"],
+        "SUKOMORO": ["Desa Sonobekel", "Desa Kecubung", "Desa Plosoharjo", "Desa Getas", "Desa Wates", "Desa Mojoseto"]
       },
       "GUDANG MADIUN": {
-        "STASIUN MADIUN": ["Desa Madiun Lor", "Desa Oro-oro Ombo"]
+        "SARADAN": ["Desa Bongsopotro"],
+        "CARUBAN": ["Desa Sumberbening", "Desa Tapelan", "Desa Purworejo", "Desa Buduran", "Desa Bener", "Desa Sidodadi", "Desa Tulung", "Desa Sukorejo"]
+      },
+      "GUDANG SIDOARJO": {
+        "PAGERWOJO": ["Desa Pagerwojo", "Desa Banjarbendo"],
+        "GEDANGAN": ["Desa Keboansikep"],
+        "BUDURAN": ["Desa Sidokerto", "Desa Sidokepung"]
+      },
+      "GUDANG SURABAYA": {
+        "MARGOREJO": ["Desa Margorejo", "Desa Jemur Wonosari"]
       }
     };
 
